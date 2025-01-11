@@ -109,6 +109,7 @@ $ awslocal s3api create-bucket --bucket my-local-bucket  --create-bucket-configu
 ```
 
 できた！！
-```$ awslocal s3 ls
+```
+$ awslocal s3 ls
 2025-01-11 09:29:37 my-local-bucket
 ```
