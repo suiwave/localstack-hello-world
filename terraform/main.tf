@@ -46,6 +46,30 @@ resource "aws_iam_role" "lambda_execution_role" {
     })
 }
 
+resource "aws_iam_policy" "lambda_cloudwatch_policy" {
+    name        = "${local.project}-cloudwatch-policy"
+    description = "Policy for Lambda to write logs to CloudWatch"
+    policy      = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Action = [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                ]
+                Effect   = "Allow"
+                Resource = "arn:aws:logs:*:*:*"
+            }
+        ]
+    })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_cloudwatch_policy_attachment" {
+    role       = aws_iam_role.lambda_execution_role.name
+    policy_arn = aws_iam_policy.lambda_cloudwatch_policy.arn
+}
+
 resource "aws_iam_policy" "lambda_s3_policy" {
     name        = "${local.project}-s3-policy"
     description = "Policy for Lambda to access S3"
@@ -56,7 +80,7 @@ resource "aws_iam_policy" "lambda_s3_policy" {
                 Action = [
                     "s3:ListBucket",
                     "s3:ListBucketVersions",
-                    "s3:ListBucketMultipartUploads"
+                    "s3:ListAllMyBuckets"
                 ]
                 Effect   = "Allow"
                 Resource = "*"
@@ -85,6 +109,7 @@ resource "aws_lambda_function" "example" {
     handler       = "index.handler"
     runtime       = "nodejs18.x"
     filename      = "lambda_function_payload.zip"
+    architectures = ["arm64"]
 
     environment {
         variables = {
