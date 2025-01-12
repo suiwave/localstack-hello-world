@@ -13,6 +13,9 @@ coverage/
 *.tmp
 *.swp
 
+# lambda
+*.zip
+
 # Terraform
 *.tfstate
 *.tfstate.*
