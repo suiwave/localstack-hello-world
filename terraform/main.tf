@@ -86,5 +86,11 @@ resource "aws_lambda_function" "example" {
     runtime       = "nodejs18.x"
     filename      = "lambda_function_payload.zip"
 
+    environment {
+        variables = {
+            ENV = "prod"
+        }
+    }
+
     source_code_hash = filebase64sha256("lambda_function_payload.zip")
 }

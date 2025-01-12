@@ -2,7 +2,7 @@ import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 // LocalStack用のS3クライアント
 const s3Client = new S3Client(
-    process.env.IS_LOCAL ? {
+    process.env.ENV === "local" ? {
         endpoint: 'http://localhost:4566',
         region: 'ap-northeast-1',
         credentials: {
