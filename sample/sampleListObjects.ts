@@ -1,4 +1,3 @@
-// s3-test.ts
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 // LocalStack用のS3クライアント

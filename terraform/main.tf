@@ -79,12 +79,12 @@ resource "aws_iam_role_policy_attachment" "lambda_s3_policy_attachment" {
     policy_arn = aws_iam_policy.lambda_s3_policy.arn
 }
 
-# resource "aws_lambda_function" "example" {
-#     function_name = "${local.project}-function"
-#     role          = aws_iam_role.lambda_execution_role.arn
-#     handler       = "index.handler"
-#     runtime       = "nodejs18.x"
-#     filename      = "lambda_function_payload.zip"
+resource "aws_lambda_function" "example" {
+    function_name = "${local.project}-function"
+    role          = aws_iam_role.lambda_execution_role.arn
+    handler       = "index.handler"
+    runtime       = "nodejs18.x"
+    filename      = "lambda_function_payload.zip"
 
-#     source_code_hash = filebase64sha256("lambda_function_payload.zip")
-# }
+    source_code_hash = filebase64sha256("lambda_function_payload.zip")
+}

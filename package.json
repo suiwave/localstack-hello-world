@@ -4,7 +4,9 @@
   "description": "WSL2 ubuntu上で実施",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "zip": "npm run build && mkdir -p ./package && cp -r dist/ package/ && cp package.json package-lock.json package/ && cd package && npm install --production && zip -r ../lambda.zip . && cd .. && rm -rf package"
   },
   "author": "",
   "license": "ISC",

@@ -157,7 +157,7 @@ $ npm i
 ### サンプルコードの準備
 
 該当リージョンのバケットをリスト表示するサンプル  
-```sampleListBuckets.ts
+```sample/sampleListBuckets.ts
 import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
 
 // LocalStack用のS3クライアント
@@ -196,7 +196,7 @@ listBuckets()
 ```
 該当バケット内のオブジェクトをリスト表示するサンプル  
 
-```sampleListObjects.ts
+```sample/sampleListObjects.ts
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3';
 
 // LocalStack用のS3クライアント
@@ -242,14 +242,14 @@ listObjects('my-local-bucket')
 
 ## 検証
 ```
-$ npx tsx sampleListBuckets.ts 
+$ npx tsx sample/sampleListBuckets.ts 
 S3 Buckets:
 - my-local-bucket (created: Sun Jan 12 2025 08:49:08 GMT+0900 (Japan Standard Time))
 Done
 ```
 
 ```
-$ npx tsx sampleListObjects.ts 
+$ npx tsx sample/sampleListObjects.ts 
 Objects in bucket: [
   {
     Key: 'README.md',
