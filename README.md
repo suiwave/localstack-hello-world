@@ -263,3 +263,173 @@ Done
 ```
 
 良い感じ！
+
+## local環境のリソースの状態保存
+
+https://docs.localstack.cloud/user-guide/state-management/cloud-pods/
+
+### 有料だった
+```
+$ localstack pod save s3-test
+👋 This feature is part of our paid offering!
+=============================================
+You tried to use a LocalStack feature that requires a paid subscription,
+but the license activation has failed! 🔑❌
+
+Reason: No credentials were found in the environment. Please make sure to
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+
+Reason: No credentials were found in the environment. Please make sure to
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+If you are using the CLI, you can also run `localstack auth set-
+token`.
+
+Due to this error, LocalStack has quit.
+
+
+Reason: No credentials were found in the environment. Please make sure to
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+If you are using the CLI, you can also run `localstack auth set-
+token`.
+
+
+Reason: No credentials were found in the environment. Please make sure to
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+Reason: No credentials were found in the environment. Please make sure to
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+either set the LOCALSTACK_AUTH_TOKEN variable to a valid auth token.
+If you are using the CLI, you can also run `localstack auth set-
+token`.
+
+Due to this error, LocalStack has quit.
+
+- Please check that your credentials are set up correctly and that you have an active license.
+  You can find your credentials in our webapp at https://app.localstack.cloud.
+- If you haven't yet, sign up on the webapp and get a free trial!
+```
+
+
+### 弱い代替案だが、terraformでlocalstack環境のリソースを作成することが可能
+https://docs.localstack.cloud/user-guide/integrations/terraform/
+
+```terraform-local/main.tf
+############################################################################
+## terraformブロック
+############################################################################
+terraform {
+  # Terraformのバージョン指定
+  required_version = "~> 1.7.0"
+
+  # Terraformのaws用ライブラリのバージョン指定
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.33.0"
+    }
+  }
+}
+
+############################################################################
+## providerブロック
+############################################################################
+provider "aws" {
+  # リージョンを指定
+  region = "ap-northeast-1"
+
+  # LocalStackを利用する場合の設定
+  # https://docs.localstack.cloud/user-guide/integrations/terraform/
+  access_key                  = "test"
+  secret_key                  = "test"
+  s3_use_path_style           = true
+  skip_credentials_validation = true
+  skip_metadata_api_check     = true
+  skip_requesting_account_id  = true
+
+  endpoints {
+    s3             = "http://localhost:4566"
+  }
+}
+
+locals {
+  project = "localstack-terraform"
+}
+
+############################################################################
+## resourceブロック
+############################################################################
+# Localstackでしか作れないような汎用的な名前のバケット
+resource "aws_s3_bucket" "bucket" {
+  bucket = "sample-bucket"
+}
+```
+
+
+```
+$ terraform apply
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated with   
+the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  # aws_s3_bucket.bucket will be created
+  + resource "aws_s3_bucket" "bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = "sample-bucket"
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = false
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags_all                    = (known after apply)
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+    }
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+╷
+│ Warning: AWS account ID not found for provider
+│
+│   with provider["registry.terraform.io/hashicorp/aws"],
+│   on main.tf line 20, in provider "aws":
+│   20: provider "aws" {
+│
+│ See https://registry.terraform.io/providers/hashicorp/aws/latest/docs#skip_requesting_account_id for implications.  
+╵
+
+Do you want to perform these actions?
+  Terraform will perform the actions described above.
+  Only 'yes' will be accepted to approve.
+
+  Enter a value: yes
+
+aws_s3_bucket.bucket: Creating...
+aws_s3_bucket.bucket: Creation complete after 1s [id=sample-bucket]
+╷
+│ Warning: AWS account ID not found for provider
+│
+│   with provider["registry.terraform.io/hashicorp/aws"],
+│   on main.tf line 20, in provider "aws":
+│   20: provider "aws" {
+│
+│ See https://registry.terraform.io/providers/hashicorp/aws/latest/docs#skip_requesting_account_id for implications.  
+╵
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+しっかりリソースはできている
+
+```
+$ awslocal s3 ls
+2025-01-13 08:56:43 test
+2025-01-13 09:39:48 sample-bucket
+```
